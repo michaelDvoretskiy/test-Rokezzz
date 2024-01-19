@@ -2,20 +2,34 @@
 
 namespace App\Controller;
 
+use App\ServiceInterface\WorkApplicationServiceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 
 #[Route('/work-application', name: 'work_app_')]
 class WorkApplicationController extends AbstractController
 {
-    #[Route('', name: 'get_list', methods: ['GET'])]
-    public function index(): JsonResponse
+    public function __construct(
+        private WorkApplicationServiceInterface $workApplicationService,
+        private SerializerInterface $serializer
+    )
     {
-        return $this->json([
-            'message' => 'This is the list of all work applications!',
-        ]);
+
+    }
+
+    #[Route('', name: 'get_list', methods: ['GET'])]
+    public function index(Request $request): JsonResponse
+    {
+        $orderField = $request->query->get('orderBy', '');
+        $orderType = $request->query->get('orderDir', 'asc');
+        return new JsonResponse($this->serializer->serialize(
+            $this->workApplicationService->getWorkAppList($orderField, $orderType),
+            'json',
+            ['groups' => ['workAppList']]
+        ), 200, [], true);
     }
 
     #[Route('/new', name: 'get_new', methods: ['GET'])]
