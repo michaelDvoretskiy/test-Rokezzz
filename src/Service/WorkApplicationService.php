@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Dto\WorkAppGetRequestDto;
+use App\Entity\ViewedWorkApp;
 use App\Entity\WorkApplication;
 use App\ServiceInterface\WorkApplicationServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -41,8 +42,23 @@ class WorkApplicationService implements WorkApplicationServiceInterface
             ->getNewWithOrder($orderBy, $orderDir);
     }
 
-    public function getOneWorkApp(int $workAppId): ?WorkApplication
+    public function getOneWorkApp(int $workAppId, WorkAppGetRequestDto $appGetRequestDto): ?WorkApplication
     {
+        $workApp = $this->em->getRepository(WorkApplication::class)->find($workAppId);
+        if ($workApp && isset($appGetRequestDto->userId)) {
+            $workAppViewed = $this->em->getRepository(ViewedWorkApp::class)
+                ->findOneBy([
+                    'UserId' => $appGetRequestDto->userId,
+                    'workApp' => $workApp
+                ]);
+            if (!$workAppViewed) {
+                $workAppViewed = (new ViewedWorkApp())
+                    ->setUserId($appGetRequestDto->userId)
+                    ->setWorkApp($workApp);
+                $this->em->persist($workAppViewed);
+                $this->em->flush();
+            }
+        }
         return $this->em->getRepository(WorkApplication::class)->find($workAppId);
     }
 

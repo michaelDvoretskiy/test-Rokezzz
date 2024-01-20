@@ -8,8 +8,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 
 #[ORM\Entity(repositoryClass: WorkApplicationRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class WorkApplication
 {
+    const LEVEL_JUNIOR = 'junior';
+    const LEVEL_REGULAR = 'regular';
+    const LEVEL_SENIOR = 'senior';
+    const SALARY_REGULAR_START = 5000;
+    const SALARY_SENIOR_START = 10000;
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -151,5 +157,25 @@ class WorkApplication
     public function getDateCreated():string
     {
         return $this->createdAt->format("Y-m-d h:i:s");
+    }
+
+    #[ORM\PrePersist]
+    public function setCreatedAtValue(): void
+    {
+        $this->createdAt = new \DateTime();
+    }
+
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
+    public function setLevelAtValue(): void
+    {
+        $level = self::LEVEL_SENIOR;
+        if ($this->getSalary() < self::SALARY_SENIOR_START) {
+            $level = self::LEVEL_REGULAR;
+        }
+        if ($this->getSalary() < self::SALARY_REGULAR_START) {
+            $level = self::LEVEL_JUNIOR;
+        }
+        $this->level = $level;
     }
 }

@@ -18,12 +18,12 @@ class WorkAppEditService implements WorkAppEditServiceInterface
     public function addWorkApp(WorkAppCreateDto $appCreateDto): int
     {
         $newWorkApp = $this->fillWorkAppFromDto(new WorkApplication(), $appCreateDto);
-        try {
+//        try {
             $this->em->persist($newWorkApp);
             $this->em->flush();
-        } catch(\Throwable $e) {
-            return 0;
-        }
+//        } catch(\Throwable $e) {
+//            return 0;
+//        }
         return $newWorkApp->getId();
     }
 
@@ -68,7 +68,8 @@ class WorkAppEditService implements WorkAppEditServiceInterface
             ->setPhone($workAppCreateDto->phone)
             ->setPosition($workAppCreateDto->position)
             ->setSalary($workAppCreateDto->salary)
-            ->setCreatedAt(new \DateTime())
-            ->setLevel("!!!");
+//            ->setCreatedAt(new \DateTime())
+//            ->setLevel("!!!")
+            ;
     }
 }

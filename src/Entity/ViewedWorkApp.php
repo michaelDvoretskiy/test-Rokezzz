@@ -39,14 +39,14 @@ class ViewedWorkApp
         return $this;
     }
 
-    public function getWorkAppId(): ?WorkApplication
+    public function getWorkApp(): ?WorkApplication
     {
         return $this->workAppId;
     }
 
-    public function setWorkAppId(?WorkApplication $workAppId): static
+    public function setWorkApp(?WorkApplication $workApp): static
     {
-        $this->workAppId = $workAppId;
+        $this->workApp = $workApp;
 
         return $this;
     }

@@ -11,5 +11,5 @@ interface WorkApplicationServiceInterface
 
     public function getNewWorkAppList(WorkAppGetRequestDto $appGetRequestDto): array;
 
-    public function getOneWorkApp(int $workAppId): ?WorkApplication;
+    public function getOneWorkApp(int $workAppId, WorkAppGetRequestDto $appGetRequestDto): ?WorkApplication;
 }

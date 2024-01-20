@@ -51,11 +51,11 @@ class WorkApplicationController extends AbstractController
     }
 
     #[Route('/{workAppId}', name: 'get_one', methods: ['GET'], requirements: ['workAppId' => '\d+'])]
-    public function getOne(int $workAppId): JsonResponse
+    public function getOne(int $workAppId, WorkAppGetRequestDto $appGetRequestDto): JsonResponse
     {
         return $this->jsonResponsesService->success(
             $this->serializer->serialize(
-                $this->workApplicationService->getOneWorkApp($workAppId),
+                $this->workApplicationService->getOneWorkApp($workAppId, $appGetRequestDto),
                 'json',
                 ['groups' => ['oneWorkApp']]
             )
