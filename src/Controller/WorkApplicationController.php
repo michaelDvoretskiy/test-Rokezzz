@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Dto\WorkAppGetRequestDto;
+use App\ServiceInterface\JsonResponsesServiceInterface;
 use App\ServiceInterface\WorkApplicationServiceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,30 +16,35 @@ class WorkApplicationController extends AbstractController
 {
     public function __construct(
         private WorkApplicationServiceInterface $workApplicationService,
-        private SerializerInterface $serializer
+        private SerializerInterface $serializer,
+        private JsonResponsesServiceInterface $jsonResponsesService
     )
     {
 
     }
 
-    #[Route('', name: 'get_list', methods: ['GET'])]
-    public function index(Request $request): JsonResponse
+    #[Route('', name: 'get_viewed', methods: ['GET'])]
+    public function index(WorkAppGetRequestDto $appGetRequestDto): JsonResponse
     {
-        $orderField = $request->query->get('orderBy', '');
-        $orderType = $request->query->get('orderDir', 'asc');
-        return new JsonResponse($this->serializer->serialize(
-            $this->workApplicationService->getWorkAppList($orderField, $orderType),
-            'json',
-            ['groups' => ['workAppList']]
-        ), 200, [], true);
+        return $this->jsonResponsesService->success(
+            $this->serializer->serialize(
+                $this->workApplicationService->getViewedWorkAppList($appGetRequestDto),
+                'json',
+                ['groups' => ['workAppList']]
+            )
+        );
     }
 
     #[Route('/new', name: 'get_new', methods: ['GET'])]
-    public function getNew(): JsonResponse
+    public function getNew(WorkAppGetRequestDto $appGetRequestDto): JsonResponse
     {
-        return $this->json([
-            'message' => 'This is the list of new work applications!',
-        ]);
+        return $this->jsonResponsesService->success(
+            $this->serializer->serialize(
+                $this->workApplicationService->getNewWorkAppList($appGetRequestDto),
+                'json',
+                ['groups' => ['workAppList']]
+            )
+        );
     }
 
     #[Route('/{workAppId}', name: 'get_one', methods: ['GET'], requirements: ['workAppId' => '\d+'])]

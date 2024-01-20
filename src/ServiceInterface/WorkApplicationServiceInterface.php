@@ -2,7 +2,11 @@
 
 namespace App\ServiceInterface;
 
+use App\Dto\WorkAppGetRequestDto;
+
 interface WorkApplicationServiceInterface
 {
-    public function getWorkAppList(string $orderField, string $orderType): array;
+    public function getViewedWorkAppList(WorkAppGetRequestDto $appGetRequestDto): array;
+
+    public function getNewWorkAppList(WorkAppGetRequestDto $appGetRequestDto): array;
 }
