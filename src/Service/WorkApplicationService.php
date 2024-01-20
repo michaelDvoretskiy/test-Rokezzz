@@ -41,6 +41,11 @@ class WorkApplicationService implements WorkApplicationServiceInterface
             ->getNewWithOrder($orderBy, $orderDir);
     }
 
+    public function getOneWorkApp(int $workAppId): ?WorkApplication
+    {
+        return $this->em->getRepository(WorkApplication::class)->find($workAppId);
+    }
+
     private function getOrder(WorkAppGetRequestDto $appGetRequestDto): array
     {
         return [

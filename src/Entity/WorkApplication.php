@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\WorkApplicationRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 
 #[ORM\Entity(repositoryClass: WorkApplicationRepository::class)]
 class WorkApplication
@@ -12,36 +13,39 @@ class WorkApplication
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['workAppList'])]
+    #[Groups(['workAppList', 'oneWorkApp'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups(['workAppList'])]
+    #[Groups(['workAppList', 'oneWorkApp'])]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 70)]
-    #[Groups(['workAppList'])]
+    #[Groups(['workAppList', 'oneWorkApp'])]
     private ?string $lastName = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['oneWorkApp'])]
     private ?string $email = null;
 
     #[ORM\Column(length: 20)]
+    #[Groups(['oneWorkApp'])]
     private ?string $phone = null;
 
     #[ORM\Column]
+    #[Groups(['oneWorkApp'])]
     private ?int $salary = null;
 
     #[ORM\Column(length: 150)]
-    #[Groups(['workAppList'])]
+    #[Groups(['workAppList', 'oneWorkApp'])]
     private ?string $position = null;
 
     #[ORM\Column(length: 10)]
-    #[Groups(['workAppList'])]
+    #[Groups(['workAppList', 'oneWorkApp'])]
     private ?string $level = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+    private ?\DateTime $createdAt = null;
 
     public function getId(): ?int
     {
@@ -132,15 +136,20 @@ class WorkApplication
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function setCreatedAt(\DateTime $createdAt): static
     {
         $this->createdAt = $createdAt;
 
         return $this;
+    }
+    #[Groups(['oneWorkApp'])]
+    public function getDateCreated():string
+    {
+        return $this->createdAt->format("Y-m-d h:i:s");
     }
 }

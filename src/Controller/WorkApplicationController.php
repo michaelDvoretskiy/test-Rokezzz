@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Dto\WorkAppCreateDto;
 use App\Dto\WorkAppGetRequestDto;
 use App\ServiceInterface\JsonResponsesServiceInterface;
+use App\ServiceInterface\WorkAppEditServiceInterface;
 use App\ServiceInterface\WorkApplicationServiceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,6 +18,7 @@ class WorkApplicationController extends AbstractController
 {
     public function __construct(
         private WorkApplicationServiceInterface $workApplicationService,
+        private WorkAppEditServiceInterface $workAppEditService,
         private SerializerInterface $serializer,
         private JsonResponsesServiceInterface $jsonResponsesService
     )
@@ -50,34 +53,41 @@ class WorkApplicationController extends AbstractController
     #[Route('/{workAppId}', name: 'get_one', methods: ['GET'], requirements: ['workAppId' => '\d+'])]
     public function getOne(int $workAppId): JsonResponse
     {
-        return $this->json([
-            'message' => 'This is the work application with id '.$workAppId.'!',
-        ]);
+        return $this->jsonResponsesService->success(
+            $this->serializer->serialize(
+                $this->workApplicationService->getOneWorkApp($workAppId),
+                'json',
+                ['groups' => ['oneWorkApp']]
+            )
+        );
     }
 
     #[Route('', name: 'add', methods: ['POST'])]
-    public function add(Request $request): JsonResponse
+    public function add(WorkAppCreateDto $appCreateDto): JsonResponse
     {
-        return $this->json([
-            'message' => 'This is the adding work application !',
-            'data' => json_decode($request->getContent(), true)
-        ]);
+        $newId = $this->workAppEditService->addWorkApp($appCreateDto);
+        if (!$newId) {
+            $this->jsonResponsesService->generalError();
+        }
+
+        return $this->jsonResponsesService->success(['id' => $newId]);
     }
 
     #[Route('/{workAppId}', name: 'edit_one', methods: ['PUT'], requirements: ['workAppId' => '\d+'])]
-    public function edit(Request $request, int $workAppId): JsonResponse
+    public function edit(int $workAppId, WorkAppCreateDto $appCreateDto): JsonResponse
     {
-        return $this->json([
-            'message' => 'Editing the work application with id '.$workAppId.'!',
-            'data' => json_decode($request->getContent(), true)
-        ]);
+        if (!$this->workAppEditService->editWorkApp($workAppId, $appCreateDto)) {
+            $this->jsonResponsesService->generalError();
+        }
+        return $this->jsonResponsesService->success();
     }
 
     #[Route('/{workAppId}', name: 'remove_one', methods: ['DELETE'], requirements: ['workAppId' => '\d+'])]
     public function remove(int $workAppId): JsonResponse
     {
-        return $this->json([
-            'message' => 'Removing the work application with id '.$workAppId.'!'
-        ]);
+        if (!$this->workAppEditService->removeWorkApp($workAppId)) {
+            $this->jsonResponsesService->generalError();
+        }
+        return $this->jsonResponsesService->success();
     }
 }
